@@ -1,0 +1,16 @@
+{
+  "name": "rebanho-vivo-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "mqtt": "^5.10.1",
+    "pg": "^8.12.0"
+  }
+}

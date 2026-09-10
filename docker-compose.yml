@@ -1,0 +1,37 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    ports:
+      - "1883:1883"
+    restart: unless-stopped
+
+  db:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_USER: rebanho
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-rebanho123}
+      POSTGRES_DB: rebanho
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgres://rebanho:${DB_PASSWORD:-rebanho123}@db:5432/rebanho
+      MQTT_URL: mqtt://mqtt:1883
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mqtt
+      - db
+    restart: unless-stopped
+
+volumes:
+  pgdata:
