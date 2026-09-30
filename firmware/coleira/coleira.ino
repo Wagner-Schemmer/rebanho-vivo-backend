@@ -1,4 +1,4 @@
-// RebanhoVivo — firmware protótipo (Wemos D1 Mini + MPU6050 -> MQTT)
+// DataBov — firmware protótipo (Wemos D1 Mini + MPU6050 -> MQTT)
 // Bibliotecas (Arduino IDE > Library Manager):
 //   - PubSubClient (Nick O'Leary)
 //   - ArduinoJson (Benoit Blanchon)
@@ -93,7 +93,7 @@ void loop() {
     char buf[256];
     serializeJson(doc, buf);
     char topic[64];
-    snprintf(topic, sizeof(topic), "rebanho/%s/telemetry", DEVICE_ID);
+    snprintf(topic, sizeof(topic), "databov/%s/telemetry", DEVICE_ID);
     mqtt.publish(topic, buf);
     sumMag = 0;
     nSamples = 0;

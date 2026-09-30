@@ -10,9 +10,9 @@ services:
   db:
     image: timescale/timescaledb:latest-pg16
     environment:
-      POSTGRES_USER: rebanho
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-rebanho123}
-      POSTGRES_DB: rebanho
+      POSTGRES_USER: databov
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-databov123}
+      POSTGRES_DB: databov
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -23,7 +23,7 @@ services:
   api:
     build: ./api
     environment:
-      DATABASE_URL: postgres://rebanho:${DB_PASSWORD:-rebanho123}@db:5432/rebanho
+      DATABASE_URL: postgres://databov:${DB_PASSWORD:-databov123}@db:5432/databov
       MQTT_URL: mqtt://mqtt:1883
       PORT: 3001
     ports:

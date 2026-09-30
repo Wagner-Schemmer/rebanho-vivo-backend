@@ -28,11 +28,11 @@ async function evaluate(device, mag) {
   }
 }
 
-// ---------- MQTT: rebanho/<device>/telemetry ----------
+// ---------- MQTT: databov/<device>/telemetry ----------
 const client = mqtt.connect(process.env.MQTT_URL || "mqtt://localhost:1883");
 client.on("connect", () => {
   console.log("[mqtt] conectado");
-  client.subscribe("rebanho/+/telemetry", (err) => {
+  client.subscribe("databov/+/telemetry", (err) => {
     if (err) console.error("[mqtt] subscribe:", err.message);
   });
 });
@@ -52,7 +52,7 @@ client.on("message", async (topic, payload) => {
 });
 
 // ---------- REST ----------
-app.get("/api/health", (_req, res) => res.json({ ok: true, service: "rebanho-vivo" }));
+app.get("/api/health", (_req, res) => res.json({ ok: true, service: "databov" }));
 app.get("/api/devices", async (_req, res) => res.json(await listDevices()));
 app.get("/api/devices/:id/telemetry", async (req, res) => {
   const { from, to, limit } = req.query;

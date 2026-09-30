@@ -1,9 +1,9 @@
-# RebanhoVivo — Backend da coleira
+# DataBov — Backend da coleira
 
 MQTT + TimescaleDB + API REST + firmware ESP8266. Roda no gateway da propriedade (Raspberry Pi, mini-PC ou VPS).
 
 ```
-rebanho-vivo-backend/
+databov-backend/
 ├── docker-compose.yml   # mosquitto + timescaledb + api
 ├── mosquitto/           # config do broker
 ├── db/init.sql          # devices, telemetry (hypertable), alerts
@@ -19,7 +19,7 @@ docker compose logs -f api
 ```
 
 ## Tópicos MQTT
-- `rebanho/<device>/telemetry` → `{"mag":1.2,"ax":..,"ay":..,"az":..,"gx":..,"gy":..,"gz":..,"batt":3.9,"ts":"2026-.."}`
+- `databov/<device>/telemetry` → `{"mag":1.2,"ax":..,"ay":..,"az":..,"gx":..,"gy":..,"gz":..,"batt":3.9,"ts":"2026-.."}`
 - `mag` é calculada na API se ausente.
 
 ## REST

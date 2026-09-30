@@ -1,4 +1,4 @@
--- RebanhoVivo — schema inicial (TimescaleDB)
+-- DataBov — schema inicial (TimescaleDB)
 CREATE TABLE IF NOT EXISTS devices (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
