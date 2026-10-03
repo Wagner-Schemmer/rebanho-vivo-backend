@@ -7,6 +7,14 @@ const pool = new pg.Pool({
 
 pool.on("error", (err) => console.error("[db] pool error:", err.message));
 
+export async function upsertDevice(id, name) {
+  await pool.query(
+    `INSERT INTO devices (id, name) VALUES ($1, $2)
+     ON CONFLICT (id) DO NOTHING`,
+    [id, name || id]
+  );
+}
+
 export async function insertTelemetry(t) {
   await pool.query(
     `INSERT INTO telemetry (time, device_id, ax, ay, az, gx, gy, gz, mag, batt)
