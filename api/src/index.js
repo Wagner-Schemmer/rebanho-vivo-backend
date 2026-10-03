@@ -4,7 +4,7 @@ import cors from "cors";
 import mqtt from "mqtt";
 import {
   insertTelemetry, createAlert, listDevices,
-  deviceTelemetry, listAlerts, ackAlert,
+  deviceTelemetry, listAlerts, ackAlert, upsertDevice,
 } from "./db.js";
 
 const app = express();
@@ -35,11 +35,35 @@ client.on("connect", () => {
   client.subscribe("databov/+/telemetry", (err) => {
     if (err) console.error("[mqtt] subscribe:", err.message);
   });
+  // Registros agregados de 1 min vindos da coleira v2 (firmware com MQTT)
+  client.subscribe("databov/+/status", (err) => {
+    if (err) console.error("[mqtt] subscribe status:", err.message);
+  });
 });
+
+// Alerta de bem-estar baixo com intervalo mínimo de 1h por animal
+const lastWelfareAlert = new Map();
+async function welfareCheck(device, bemEstar, valido) {
+  if (!valido || bemEstar > 2) return;
+  const last = lastWelfareAlert.get(device) || 0;
+  if (Date.now() - last < 3600000) return;
+  lastWelfareAlert.set(device, Date.now());
+  await createAlert(device, "WELFARE_LOW", `Índice de bem-estar ${bemEstar}/5 (triagem, verificar animal)`);
+}
 client.on("message", async (topic, payload) => {
   try {
-    const device = topic.split("/")[1];
+    const parts = topic.split("/");
+    const device = parts[1];
+    const kind = parts[2];
     const data = JSON.parse(payload.toString());
+    if (kind === "status") {
+      // Agregado de 1 min da coleira v2: odba vira proxy de atividade
+      await upsertDevice(device, data.colar || device);
+      const t = { device, mag: data.odba ?? null, batt: data.batt ?? null };
+      await insertTelemetry(t);
+      await welfareCheck(device, data.bem_estar, data.bem_estar_valido);
+      return;
+    }
     const t = { device, ...data };
     if (t.ax != null && t.mag == null) {
       t.mag = Math.sqrt(t.ax ** 2 + (t.ay || 0) ** 2 + (t.az || 0) ** 2);
