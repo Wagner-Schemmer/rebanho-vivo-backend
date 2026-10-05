@@ -41,10 +41,8 @@
 // ===================== CONFIGURAÇÃO =====================
 const char* WIFI_SSID  = "SUA_REDE";
 const char* WIFI_PASS  = "SUA_SENHA";
-// Rede corporativa (PEAP, ex: IFFar-estudantes): ponha 1 e preencha usuário
-#define USE_WPA2_ENT 0
-const char* WIFI_USER  = "SEU_USUARIO";
-const char* WIFI_IDENT = "SEU_USUARIO"; // identidade externa (geralmente igual)
+// NOTA: ESP8266 NÃO suporta rede corporativa (PEAP, ex: IFFar-estudantes).
+// Use Wi-Fi doméstico ou hotspot do celular (WPA2 comum).
 const char* SERVER_URL = "http://192.168.0.10:5000/telemetria"; // legado CSV (USE_HTTP=1)
 const char* COLLAR_ID  = "C-0001";
 
@@ -420,11 +418,7 @@ void processarMax() {
 bool wifiOn() {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect(true);
-#if USE_WPA2_ENT
-  WiFi.begin(WIFI_SSID, WPA2_AUTH_PEAP, WIFI_IDENT, WIFI_USER, WIFI_PASS);
-#else
   WiFi.begin(WIFI_SSID, WIFI_PASS);
-#endif
   unsigned long t0 = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - t0 < WIFI_TIMEOUT_MS) delay(50);
   return WiFi.status() == WL_CONNECTED;
