@@ -232,7 +232,7 @@ bool mpuLer(float &ax, float &ay, float &az, float &gx, float &gy, float &gz) {
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x3B);
   if (Wire.endTransmission(false) != 0) return false;
-  if (Wire.requestFrom((int)MPU_ADDR, 14, true) != 14) return false;
+  if (Wire.requestFrom(MPU_ADDR, (size_t)14, true) != 14) return false;
   int16_t x = (Wire.read() << 8) | Wire.read();
   int16_t y = (Wire.read() << 8) | Wire.read();
   int16_t z = (Wire.read() << 8) | Wire.read();
