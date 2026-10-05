@@ -446,21 +446,27 @@ void enviarSupabase() {
       "\"seg_caminhando\":%u,\"seg_agitada\":%u}",
       COLLAR_ID, r.odba, r.hrMax, r.spo2, r.bemEstar,
       r.seg[0], r.seg[1], r.seg[2], r.seg[3], r.seg[4]);
-    if (!tls.connect(SUPA_HOST, 443)) break;
-    String req = String("POST /rest/v1/leituras HTTP/1.1\r\nHost: ") + SUPA_HOST +
-      "\r\napikey: " + SUPA_KEY + "\r\nAuthorization: Bearer " + SUPA_KEY +
-      "\r\nContent-Type: application/json\r\nPrefer: return=minimal\r\nContent-Length: " +
-      String(strlen(corpo)) + "\r\nConnection: close\r\n\r\n" + corpo;
-    tls.print(req);
-    unsigned long t0 = millis();
-    String resp;
-    while (millis() - t0 < 4000 && tls.connected()) {
-      while (tls.available()) resp += (char)tls.read();
-      if (resp.indexOf("201 Created") >= 0) break;
-      yield();
+    bool okRec = false;
+    for (int tent = 0; tent < 3 && !okRec; tent++) {
+      if (!tls.connect(SUPA_HOST, 443)) { delay(800); continue; }
+      String req = String("POST /rest/v1/leituras HTTP/1.1\r\nHost: ") + SUPA_HOST +
+        "\r\napikey: " + SUPA_KEY + "\r\nAuthorization: Bearer " + SUPA_KEY +
+        "\r\nContent-Type: application/json\r\nPrefer: return=minimal\r\nContent-Length: " +
+        String(strlen(corpo)) + "\r\nConnection: close\r\n\r\n" + corpo;
+      tls.print(req);
+      unsigned long t0 = millis();
+      String resp;
+      resp.reserve(200);
+      while (millis() - t0 < 15000 && tls.connected()) {
+        while (tls.available()) resp += (char)tls.read();
+        if (resp.indexOf("201 Created") >= 0) break;
+        yield();
+      }
+      tls.stop();
+      if (resp.indexOf("201") >= 0) okRec = true;
+      else delay(800);
     }
-    tls.stop();
-    if (resp.indexOf("201") >= 0) algumOk = true;
+    if (okRec) algumOk = true;
     else {
 #if DEBUG_SERIAL
       Serial.println("[supa] falha em um registro");
