@@ -33,6 +33,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <Wire.h>
 #include <MAX30105.h>
 #include <PubSubClient.h>
@@ -45,6 +46,11 @@ const char* COLLAR_ID  = "C-0001";
 
 const char* MQTT_HOST = "IP_DO_GATEWAY"; // broker do backend DataBov
 const int   MQTT_PORT = 1883;
+
+// Supabase (dashboard ao vivo no site): host sem https://, chave anon (pública)
+const char* SUPA_HOST = "bjzyrzpilrvolycbdeyk.supabase.co";
+const char* SUPA_KEY  = "sb_publishable_9Vr4s6HGBILeHTe8qHRh-A_RMtgE1hd";
+#define USE_SUPABASE 1   // 1 = espelha cada registro em /leituras (HTTPS)
 
 #define USE_MAX30102 1   // 1 = HR real + SpO2 via MAX30102
 #define USE_PULSE    0   // 1 = PulseSensor em A0 (desliga leitura de bateria)
@@ -420,6 +426,52 @@ void wifiOff() {
   WiFi.mode(WIFI_OFF);
 }
 
+#if USE_SUPABASE
+// Espelha os registros da fila em /leituras (melhor esforço: não trava a fila).
+void enviarSupabase() {
+  if (filaN == 0) return;
+  WiFiClientSecure tls;
+  tls.setInsecure();
+  tls.setTimeout(4000);
+  bool algumOk = false;
+  for (int i = 0; i < filaN; i++) {
+    const Registro &r = fila[i];
+    char corpo[260];
+    snprintf(corpo, sizeof(corpo),
+      "{\"device\":\"%s\",\"odba\":%.3f,\"hr_max\":%u,\"spo2\":%u,\"bem_estar\":%u,"
+      "\"seg_ocioso\":%u,\"seg_ruminando\":%u,\"seg_alimentando\":%u,"
+      "\"seg_caminhando\":%u,\"seg_agitada\":%u}",
+      COLLAR_ID, r.odba, r.hrMax, r.spo2, r.bemEstar,
+      r.seg[0], r.seg[1], r.seg[2], r.seg[3], r.seg[4]);
+    if (!tls.connect(SUPA_HOST, 443)) break;
+    String req = String("POST /rest/v1/leituras HTTP/1.1\r\nHost: ") + SUPA_HOST +
+      "\r\napikey: " + SUPA_KEY + "\r\nAuthorization: Bearer " + SUPA_KEY +
+      "\r\nContent-Type: application/json\r\nPrefer: return=minimal\r\nContent-Length: " +
+      String(strlen(corpo)) + "\r\nConnection: close\r\n\r\n" + corpo;
+    tls.print(req);
+    unsigned long t0 = millis();
+    String resp;
+    while (millis() - t0 < 4000 && tls.connected()) {
+      while (tls.available()) resp += (char)tls.read();
+      if (resp.indexOf("201 Created") >= 0) break;
+      yield();
+    }
+    tls.stop();
+    if (resp.indexOf("201") >= 0) algumOk = true;
+    else {
+#if DEBUG_SERIAL
+      Serial.println("[supa] falha em um registro");
+#endif
+    }
+  }
+  if (algumOk) {
+#if DEBUG_SERIAL
+    Serial.println("[supa] espelhado");
+#endif
+  }
+}
+#endif
+
 bool enviarLote() {
   bool ok = false;
 #if USE_HTTP
@@ -500,6 +552,12 @@ bool enviarLote() {
     else Serial.println("[mqtt] broker inalcançável");
 #endif
   }
+#endif
+
+#if USE_SUPABASE
+  // Mesma janela de Wi-Fi: espelha a fila no Supabase (não conta p/ limpar a fila)
+  if (WiFi.status() != WL_CONNECTED) wifiOn();
+  if (WiFi.status() == WL_CONNECTED) enviarSupabase();
 #endif
 
   wifiOff();
