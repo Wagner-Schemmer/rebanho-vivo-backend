@@ -57,7 +57,7 @@ const char* SUPA_KEY  = "sb_publishable_9Vr4s6HGBILeHTe8qHRh-A_RMtgE1hd";
 #define USE_HTTP     1   // 1 = mantém POST legado p/ telemetria.csv
 #define USE_MQTT     1   // 1 = publica agregado em databov/<id>/status
 
-const int LOTE_ALVO = 5;
+const int LOTE_ALVO = 1; // MODO DEMO: envia a cada registro (campo: 5)
 const unsigned long WIFI_TIMEOUT_MS = 8000;
 
 const float ODBA_AGITADA     = 0.45f;
@@ -88,7 +88,7 @@ const unsigned long PERIODO_US = 1000000UL / 100UL;
 
 const int WIN_S = 3;
 const int WIN = 300;
-const int JANELAS_POR_REGISTRO = 20;
+const int JANELAS_POR_REGISTRO = 5; // MODO DEMO: 5 x 3 s = 15 s por registro (campo: 20)
 const int FILA_MAX = 30;
 
 enum Estado : uint8_t { OCIO = 0, RUMINANDO, ALIMENTANDO, CAMINHANDO, AGITADA, N_ESTADOS };
