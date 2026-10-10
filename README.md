@@ -1,5 +1,10 @@
 # DataBov — Backend da coleira
 
+![ESP8266](https://img.shields.io/badge/ESP8266-firmware-E7352C?style=flat-square&logo=espressif&logoColor=white)
+![MQTT](https://img.shields.io/badge/MQTT-mosquitto-660066?style=flat-square&logo=eclipse-mosquitto&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+[![Site v2](https://img.shields.io/badge/DataBov-v2-4ade80?style=flat-square&logo=vercel&logoColor=white)](https://databov-v2.vercel.app)
+
 MQTT + TimescaleDB + API REST + firmware ESP8266. Roda no gateway da propriedade (Raspberry Pi, mini-PC ou VPS).
 
 ```
