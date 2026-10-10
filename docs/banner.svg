@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" font-family="Verdana, DejaVu Sans, sans-serif">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#0a0a0a"/><stop offset="1" stop-color="#142114"/>
+</linearGradient></defs>
+<rect width="1200" height="400" fill="url(#g)"/>
+<circle cx="1020" cy="60" r="220" fill="#39d353" opacity="0.16"/>
+<circle cx="120" cy="360" r="150" fill="#39d353" opacity="0.10"/>
+<rect x="0" y="392" width="1200" height="8" fill="#39d353"/>
+<text x="80" y="180" fill="#e6edf3" font-size="72" font-weight="bold">$ backend-da-coleira</text>
+<text x="80" y="240" fill="#7ee787" font-size="27">MQTT + TimescaleDB + ESP8266. Do pasto ao banco em 1 comando.</text>
+<rect x="80" y="280" width="120" height="10" rx="5" fill="#39d353"/>
+</svg>
