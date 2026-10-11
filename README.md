@@ -25,6 +25,28 @@ MQTT + TimescaleDB + API REST + firmware ESP8266. Do pasto ao banco em 1 comando
                                                             └──▶ REST: /api/devices /api/telemetry /api/alerts
 ```
 
+```mermaid
+flowchart LR
+    C[C-0001 · coleira] -->|databov/#/telemetry| M((mosquitto))
+    M --> A[api · ingestão + regras]
+    A --> T[(timescaledb · hypertable)]
+    A -->|WELFARE_LOW| AL[alertas]
+    A -->|REST| W[dashboards v1 + v2]
+```
+
+## Tópicos MQTT
+
+- `databov/<device>/telemetry` → `{"mag":1.2,"ax":..,"ay":..,"az":..,"gx":..,"gy":..,"gz":..,"batt":3.9,"ts":"2026-.."}`
+- `mag` é calculada na API se ausente.
+- `databov/<device>/status` → agregado de 1 min da coleira v2 (odba, bem_estar, hr_max, spo2…); cria o device sozinho e gera alerta `WELFARE_LOW` se índice ≤ 2 (máx 1/h por animal).
+
+## REST
+
+- `GET /api/health` → `{"ok":true}`
+- `GET /api/devices` (com último status)
+- `GET /api/devices/:id/telemetry?from=&to=&limit=`
+- `GET /api/alerts?open=1` · `POST /api/alerts/:id/ack`
+
 ## Gravar o firmware
 
 `firmware/coleira/coleira.ino` → Arduino IDE → Wemos D1 Mini. Libs: **SparkFun MAX3010x** + **PubSubClient**. Fiação e `WIFI_SSID`/`MQTT_HOST`/`COLLAR_ID` no topo do arquivo. (Compilação verificada: ESP8266 core 3.1.2.)
@@ -36,6 +58,18 @@ MQTT + TimescaleDB + API REST + firmware ESP8266. Do pasto ao banco em 1 comando
 ## Próximos pacotes (roadmap)
 
 Random Forest no lugar do limiar · RTLS BLE em vez de GPS · rádio BLE final em vez de Wi-Fi.
+
+## Stack do gateway
+
+<div align="center">
+  <img src="https://skillicons.dev/icons?i=docker,nodejs,arduino&theme=dark" alt="docker node arduino" />
+</div>
+
+Docker Compose · Mosquitto · TimescaleDB · Node.js · Arduino (ESP8266).
+
+## Uptime (star history)
+
+<a href="https://www.star-history.com/#Wagner-Schemmer/rebanho-vivo-backend&Date"><img alt="Star History" src="https://api.star-history.com/svg?repos=Wagner-Schemmer/rebanho-vivo-backend&type=Date" /></a>
 
 ---
 `logout` — [Wagner Schemmer](https://wagner-port.vercel.app) · site: [databov-v2.vercel.app](https://databov-v2.vercel.app)
