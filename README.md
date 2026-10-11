@@ -67,9 +67,5 @@ Random Forest no lugar do limiar · RTLS BLE em vez de GPS · rádio BLE final e
 
 Docker Compose · Mosquitto · TimescaleDB · Node.js · Arduino (ESP8266).
 
-## Uptime (star history)
-
-<a href="https://www.star-history.com/#Wagner-Schemmer/rebanho-vivo-backend&Date"><img alt="Star History" src="https://api.star-history.com/svg?repos=Wagner-Schemmer/rebanho-vivo-backend&type=Date" /></a>
-
 ---
 `logout` — [Wagner Schemmer](https://wagner-port.vercel.app) · site: [databov-v2.vercel.app](https://databov-v2.vercel.app)
